@@ -1,0 +1,206 @@
+# AgentGuard Policy v1.0
+# Default safe policy for OpenClaw agents
+# Edit this file to customize permission behavior
+
+version: "1.0"
+mode: default  # default | plan | auto | bypass
+
+rules:
+  # ─── READ operations (always safe) ─────────────────────────
+  - pattern: "read:*"
+    action: allow
+    description: "All read operations are safe"
+
+  # ─── WRITE operations ──────────────────────────────────────
+  - pattern: "write:*.md"
+    action: allow
+    description: "Markdown edits are safe"
+  - pattern: "write:*.txt"
+    action: allow
+    description: "Text file edits are safe"
+  - pattern: "write:*.log"
+    action: allow
+    description: "Log file writes are safe"
+  - pattern: "write:*.env"
+    action: ask
+    description: "Environment files contain secrets"
+  - pattern: "write:*.key"
+    action: deny
+    description: "Never modify key files"
+  - pattern: "write:*.pem"
+    action: deny
+    description: "Never modify certificate files"
+  - pattern: "write:/etc/*"
+    action: deny
+    description: "Never modify system files"
+  - pattern: "write:*"
+    action: ask
+    description: "Ask before any other writes"
+
+  # ─── BASH operations ──────────────────────────────────────
+  # Safe commands (auto-approve)
+  - pattern: "bash:ls*"
+    action: allow
+    description: "Listing files"
+  - pattern: "bash:cat*"
+    action: allow
+    description: "Reading file contents"
+  - pattern: "bash:find*"
+    action: allow
+    description: "Finding files"
+  - pattern: "bash:echo*"
+    action: allow
+    description: "Echo output"
+  - pattern: "bash:pwd"
+    action: allow
+    description: "Print working directory"
+  - pattern: "bash:which*"
+    action: allow
+    description: "Locate commands"
+  - pattern: "bash:head*"
+    action: allow
+    description: "Read file start"
+  - pattern: "bash:tail*"
+    action: allow
+    description: "Read file end"
+  - pattern: "bash:wc*"
+    action: allow
+    description: "Count lines/words"
+  - pattern: "bash:grep*"
+    action: allow
+    description: "Search text"
+  - pattern: "bash:tree*"
+    action: allow
+    description: "Show directory tree"
+  - pattern: "bash:date"
+    action: allow
+    description: "Show current date/time"
+  - pattern: "bash:whoami"
+    action: allow
+    description: "Show current user"
+
+  # Git operations (safe)
+  - pattern: "bash:git status*"
+    action: allow
+    description: "Git status is safe"
+  - pattern: "bash:git log*"
+    action: allow
+    description: "Git log is safe"
+  - pattern: "bash:git diff*"
+    action: allow
+    description: "Git diff is safe"
+  - pattern: "bash:git branch*"
+    action: allow
+    description: "Git branch listing is safe"
+  - pattern: "bash:git remote*"
+    action: allow
+    description: "Git remote listing is safe"
+  - pattern: "bash:git*"
+    action: allow
+    description: "Git operations are generally safe"
+
+  # Package management (safe)
+  - pattern: "bash:npm list*"
+    action: allow
+    description: "Listing packages is safe"
+  - pattern: "bash:npm*"
+    action: allow
+    description: "npm operations are safe"
+  - pattern: "bash:bun*"
+    action: allow
+    description: "bun operations are safe"
+
+  # Moderate risk (ask)
+  - pattern: "bash:mkdir*"
+    action: allow
+    description: "Creating directories is safe"
+  - pattern: "bash:touch*"
+    action: allow
+    description: "Creating empty files is safe"
+  - pattern: "bash:cp*"
+    action: ask
+    description: "Ask before copying"
+  - pattern: "bash:mv*"
+    action: ask
+    description: "Ask before moving"
+  - pattern: "bash:rm*"
+    action: ask
+    description: "Ask before deleting"
+  - pattern: "bash:chmod*"
+    action: ask
+    description: "Ask before changing permissions"
+  - pattern: "bash:chown*"
+    action: ask
+    description: "Ask before changing ownership"
+  - pattern: "bash:curl*"
+    action: ask
+    description: "Ask before HTTP requests"
+  - pattern: "bash:wget*"
+    action: ask
+    description: "Ask before downloads"
+  - pattern: "bash:docker*"
+    action: ask
+    description: "Ask before Docker operations"
+  - pattern: "bash:pip*"
+    action: ask
+    description: "Ask before Python package operations"
+  - pattern: "bash:python*"
+    action: ask
+    description: "Ask before running Python"
+  - pattern: "bash:node*"
+    action: ask
+    description: "Ask before running Node.js"
+  - pattern: "bash:bun*"
+    action: ask
+    description: "Ask before running Bun"
+  - pattern: "bash:ssh*"
+    action: ask
+    description: "Ask before SSH connections"
+  - pattern: "bash:scp*"
+    action: ask
+    description: "Ask before SCP transfers"
+  - pattern: "bash:rsync*"
+    action: ask
+    description: "Ask before rsync"
+
+  # Dangerous (deny)
+  - pattern: "bash:sudo*"
+    action: deny
+    description: "Never allow sudo"
+  - pattern: "bash:eval*"
+    action: deny
+    description: "Never allow eval"
+  - pattern: "bash:exec*"
+    action: deny
+    description: "Never allow exec"
+  - pattern: "bash:dd*"
+    action: deny
+    description: "Never allow dd (disk operations)"
+  - pattern: "bash:mkfs*"
+    action: deny
+    description: "Never allow filesystem formatting"
+  - pattern: "bash:shutdown*"
+    action: deny
+    description: "Never allow shutdown"
+  - pattern: "bash:reboot*"
+    action: deny
+    description: "Never allow reboot"
+  - pattern: "bash:systemctl*"
+    action: deny
+    description: "Never allow systemctl"
+  - pattern: "bash:iptables*"
+    action: deny
+    description: "Never allow firewall changes"
+  - pattern: "bash:crontab*"
+    action: deny
+    description: "Never allow crontab modifications"
+
+  # Catch-all for bash
+  - pattern: "bash:*"
+    action: ask
+    description: "Ask for any unrecognized bash command"
+
+  # ─── DEPLOYMENT (always deny) ──────────────────────────────
+  - pattern: "deploy:*"
+    action: deny
+    description: "Never auto-deploy"
